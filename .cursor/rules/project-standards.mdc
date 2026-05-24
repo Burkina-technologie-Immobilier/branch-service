@@ -1,0 +1,15 @@
+---
+description: Core project architecture and coding standards
+alwaysApply: true
+---
+
+# Project Standards
+
+- Use hexagonal Architecture.
+- Keep clear separation between domain, application, and infrastructure.
+- Use TypeScript strictly.
+- Use Prisma as ORM.
+- Prefer dependency injection.
+- Avoid business logic in controllers.
+- Follow TypeScript / JavaScript naming conventions (see `naming-conventions-typescript.mdc`).
+- Follow detailed architecture rules in `.cursor/rules/architecture/`.

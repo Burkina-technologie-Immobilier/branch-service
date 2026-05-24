@@ -1,0 +1,27 @@
+---
+description: Matrice de dépendances autorisées/interdites entre packages
+alwaysApply: true
+---
+
+# Architecture — Matrice des dépendances
+
+## Matrice (source -> cible)
+
+- `domain` -> `domain` : autorisé
+- `domain` -> `application|adapter|infrastructure` : interdit
+- `application` -> `domain|application` : autorisé
+- `application` -> `adapter|infrastructure` : interdit
+- `adapter` -> `application|domain|adapter|infrastructure` : autorisé selon besoin technique
+- `infrastructure` -> `infrastructure|domain` : autorisé pour types/utilitaires neutres
+
+## Règles de revue
+
+- Si un import casse la matrice, déplacer le code vers la couche correcte.
+- Préférer un port domaine plutôt qu'une dépendance technique directe.
+- Une implémentation technique doit rester derrière un adapter out.
+
+## Exemples rapides
+
+- OK: `application/use_case/*` importe `domain/port/out/*`.
+- KO: `application/use_case/*` importe `adapter/out/persistence/*`.
+- OK: `adapter/out/*` implémente `domain/port/out/*`.

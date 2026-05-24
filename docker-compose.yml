@@ -1,0 +1,69 @@
+services:
+# =====================================================================================
+# ENV DEV
+# =====================================================================================
+
+  user_profile-service-dev:
+    image: user_profile-service-dev
+    container_name: user_profile-service-dev
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    command: sh -c "pnpm exec prisma migrate deploy && pnpm exec prisma generate && pnpm run start:dev"
+    ports:
+      - "3000:3000"
+    volumes:
+      - .:/app
+      - /app/node_modules
+    environment:
+      - DATABASE_URL=postgresql://postgres:postgres@user_profile-db-dev:5432/user_profile-db
+    env_file:
+      - .env
+    depends_on:
+      - user_profile-db-dev
+    profiles: ["dev"]
+
+  user_profile-db-dev:
+    image: postgres:16
+    container_name: user_profile-db-dev
+    env_file:
+      - .env
+    ports:
+      - "5433:5432"
+    volumes:
+      - pgdata-dev:/var/lib/postgresql/data
+    profiles: ["dev"]
+
+
+# =====================================================================================
+# ENV PROD
+# =====================================================================================
+
+  user_profile-service-prod:
+    container_name: user_profile-service-prod
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+      - "5555:5555"
+    env_file:
+      - ./src/infrastructure/config/.env.prod
+    depends_on:
+      - user_profile-db-prod
+    restart: unless-stopped
+    profiles: ["prod"]
+
+  user_profile-db-prod:
+    image: postgres:16
+    container_name: user_profile-db-prod
+    env_file:
+      - ./src/infrastructure/config/.env.prod
+    volumes:
+      - pgdata-prod:/var/lib/postgresql/data
+    restart: unless-stopped
+    profiles: ["prod"]
+
+volumes:
+  pgdata-dev:
+  pgdata-prod:

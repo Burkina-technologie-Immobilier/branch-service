@@ -1,0 +1,27 @@
+---
+description: Contraintes détaillées de la couche infrastructure
+alwaysApply: true
+---
+
+# Architecture — Infrastructure
+
+## Responsabilités
+
+- Héberger la technique transverse: config, Prisma, filtres HTTP globaux, bootstrap app.
+- Fournir les briques techniques utilisées par les adapters.
+
+## Dépendances
+
+- Peut dépendre de NestJS, Prisma et libs tierces.
+- Ne doit pas porter de logique fonctionnelle métier.
+
+## Détails d'implémentation
+
+- `src/infrastructure/main.ts` et modules d'infra ne contiennent pas de règles métier.
+- `infrastructure/database/prisma/*` gère uniquement connexion, client, schéma et hooks.
+- Les filtres d'erreurs HTTP globaux (Nest) se placent typiquement sous `infrastructure/filters/*` ; ils convertissent des erreurs applicatives/domaine en réponses HTTP.
+
+## Interdits
+
+- Pas de use case dans `infrastructure/*`.
+- Pas de code métier spécifique (validation fonctionnelle, décisions métier).

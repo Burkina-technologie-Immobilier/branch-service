@@ -10,6 +10,7 @@ import {
   mockEmployeeRepository,
   mockPublicIdGenerator,
 } from '../../../helpers/repository.mocks';
+import { createTestAccessGuard, createTestEmployeeRolePolicy } from '../../../helpers/access-guard.mock';
 import {
   VALID_EMAIL,
   VALID_PUBLIC_ID_2,
@@ -25,6 +26,8 @@ describe('CreateEmployeeUseCase', () => {
     branchRepo,
     new CreateEmployeeValidator(),
     idGenerator,
+    createTestAccessGuard(),
+    createTestEmployeeRolePolicy(),
   );
 
   beforeEach(() => vi.clearAllMocks());

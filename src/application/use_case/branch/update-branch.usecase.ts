@@ -5,6 +5,8 @@ import { GetBranchQuery } from "src/domain/port/in/branch/get-branch.interface.p
 import { UpdateBranchCommand, UpdateBranchInterfacePort } from "src/domain/port/in/branch/update-branch.interface.port";
 import { BranchRepositoryPort } from "src/domain/port/out/branch.repository.port";
 import { EmployeeRepositoryPort } from "src/domain/port/out/employee.repository.port";
+import { MeublezonePermission } from "src/domain/enums/meublezone-permission.enum";
+import { AccessGuard } from "src/domain/service/policies/access.guard";
 import { UpdateBranchValidator } from "src/domain/service/validators/branch/update-branch.validator";
 
 export class UpdateBranchUseCase implements UpdateBranchInterfacePort {
@@ -12,6 +14,7 @@ export class UpdateBranchUseCase implements UpdateBranchInterfacePort {
     private readonly repository: BranchRepositoryPort,
     private readonly employeeRepository: EmployeeRepositoryPort,
     private readonly validator: UpdateBranchValidator,
+    private readonly access: AccessGuard,
   ) {}
 
   async execute(query: GetBranchQuery, command: UpdateBranchCommand): Promise<BranchEntity> {
@@ -20,6 +23,10 @@ export class UpdateBranchUseCase implements UpdateBranchInterfacePort {
     if (!entity) {
       throw new ApplicationError(CodesError.BRANCH_NOT_FOUND);
     }
+    this.access.check({
+      permission: MeublezonePermission.BRANCH_WRITE,
+      branchId: entity.id,
+    });
 
     if (command.code && command.code !== entity.code) {
       const existingCode = await this.repository.findByCode(command.code);

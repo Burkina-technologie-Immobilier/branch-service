@@ -6,12 +6,13 @@ import {
   mockBranchRepository,
   mockEmployeeRepository,
 } from '../../../helpers/repository.mocks';
+import { createTestAccessGuard } from '../../../helpers/access-guard.mock';
 import { VALID_PUBLIC_ID } from '../../../helpers/test-constants';
 
 describe('ListEmployeeUseCase', () => {
   const employeeRepo = mockEmployeeRepository();
   const branchRepo = mockBranchRepository();
-  const useCase = new ListEmployeeUseCase(employeeRepo, branchRepo);
+  const useCase = new ListEmployeeUseCase(employeeRepo, branchRepo, createTestAccessGuard());
 
   it('retourne une liste paginée', async () => {
     vi.mocked(employeeRepo.findWithPagination).mockResolvedValue({

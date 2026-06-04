@@ -10,6 +10,7 @@ import {
   mockEmployeeRepository,
   mockPublicIdGenerator,
 } from '../../../helpers/repository.mocks';
+import { createTestAccessGuard } from '../../../helpers/access-guard.mock';
 import { VALID_PUBLIC_ID_2, VALID_UUID_2 } from '../../../helpers/test-constants';
 
 describe('CreateBranchUseCase', () => {
@@ -22,6 +23,7 @@ describe('CreateBranchUseCase', () => {
     employeeRepo,
     validator,
     idGenerator,
+    createTestAccessGuard(),
   );
 
   beforeEach(() => {

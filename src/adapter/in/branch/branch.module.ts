@@ -13,6 +13,11 @@ import { CreateBranchValidator } from 'src/domain/service/validators/branch/crea
 import { UpdateBranchValidator } from 'src/domain/service/validators/branch/update-branch.validator';
 import { GetBranchValidator } from 'src/domain/service/validators/branch/get-branch.validator';
 import { DeleteBranchValidator } from 'src/domain/service/validators/branch/delete-branch.validator';
+import { AccessGuard } from 'src/domain/service/policies/access.guard';
+import {
+  SECURITY_CONTEXT_PORT,
+  SecurityContextPort,
+} from 'src/domain/port/out/security-context.port';
 
 @Module({
   imports: [PrismaModule],
@@ -27,35 +32,36 @@ import { DeleteBranchValidator } from 'src/domain/service/validators/branch/dele
     DeleteBranchValidator,
     {
       provide: CreateBranchUseCase,
-      useFactory: (repo, employeeRepo, validator, idGenerator) =>
-        new CreateBranchUseCase(repo, employeeRepo, validator, idGenerator),
+      useFactory: (repo, employeeRepo, validator, idGenerator, access) =>
+        new CreateBranchUseCase(repo, employeeRepo, validator, idGenerator, access),
       inject: [
         'BranchRepositoryPort',
         'EmployeeRepositoryPort',
         CreateBranchValidator,
         'PublicIdGeneratorPort',
+        AccessGuard,
       ],
     },
     {
       provide: UpdateBranchUseCase,
-      useFactory: (repo, employeeRepo, validator) =>
-        new UpdateBranchUseCase(repo, employeeRepo, validator),
-      inject: ['BranchRepositoryPort', 'EmployeeRepositoryPort', UpdateBranchValidator],
+      useFactory: (repo, employeeRepo, validator, access) =>
+        new UpdateBranchUseCase(repo, employeeRepo, validator, access),
+      inject: ['BranchRepositoryPort', 'EmployeeRepositoryPort', UpdateBranchValidator, AccessGuard],
     },
     {
       provide: GetBranchUseCase,
-      useFactory: (repo, validator) => new GetBranchUseCase(repo, validator),
-      inject: ['BranchRepositoryPort', GetBranchValidator],
+      useFactory: (repo, validator, access) => new GetBranchUseCase(repo, validator, access),
+      inject: ['BranchRepositoryPort', GetBranchValidator, AccessGuard],
     },
     {
       provide: ListBranchUseCase,
-      useFactory: (repo) => new ListBranchUseCase(repo),
-      inject: ['BranchRepositoryPort'],
+      useFactory: (repo, access, security) => new ListBranchUseCase(repo, access, security),
+      inject: ['BranchRepositoryPort', AccessGuard, SECURITY_CONTEXT_PORT],
     },
     {
       provide: DeleteBranchUseCase,
-      useFactory: (repo, validator) => new DeleteBranchUseCase(repo, validator),
-      inject: ['BranchRepositoryPort', DeleteBranchValidator],
+      useFactory: (repo, validator, access) => new DeleteBranchUseCase(repo, validator, access),
+      inject: ['BranchRepositoryPort', DeleteBranchValidator, AccessGuard],
     },
   ],
   exports: [

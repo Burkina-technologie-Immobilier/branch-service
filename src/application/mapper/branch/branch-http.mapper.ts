@@ -49,6 +49,7 @@ export class BranchHttpMapper {
 
   static toResponse(entity: BranchEntity): ResponseBranchDto {
     return {
+      id: entity.id!,
       publicId: entity.publicId,
       code: entity.code,
       name: entity.name,

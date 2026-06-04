@@ -3,33 +3,36 @@ services:
 # ENV DEV
 # =====================================================================================
 
-  user_profile-service-dev:
-    image: user_profile-service-dev
-    container_name: user_profile-service-dev
+  branch-service-dev:
+    image: branch-service-dev
+    container_name: branch-service-dev
     build:
       context: .
       dockerfile: Dockerfile.dev
     command: sh -c "pnpm exec prisma migrate deploy && pnpm exec prisma generate && pnpm run start:dev"
     ports:
-      - "3000:3000"
+      - "8203:8203"
     volumes:
       - .:/app
       - /app/node_modules
     environment:
-      - DATABASE_URL=postgresql://postgres:postgres@user_profile-db-dev:5432/user_profile-db
+      PORT: "8203"
+      DATABASE_URL: postgresql://postgres:postgres@branch-db-dev:5432/branch_db
     env_file:
-      - .env
+      - ./src/infrastructure/config/.env.dev
     depends_on:
-      - user_profile-db-dev
+      - branch-db-dev
     profiles: ["dev"]
 
-  user_profile-db-dev:
+  branch-db-dev:
     image: postgres:16
-    container_name: user_profile-db-dev
-    env_file:
-      - .env
+    container_name: branch-db-dev
+    environment:
+      POSTGRES_DB: branch_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
     ports:
-      - "5433:5432"
+      - "5436:5432"
     volumes:
       - pgdata-dev:/var/lib/postgresql/data
     profiles: ["dev"]
@@ -39,24 +42,26 @@ services:
 # ENV PROD
 # =====================================================================================
 
-  user_profile-service-prod:
-    container_name: user_profile-service-prod
+  branch-service-prod:
+    container_name: branch-service-prod
     build:
       context: .
       dockerfile: Dockerfile
     ports:
-      - "3000:3000"
-      - "5555:5555"
+      - "8203:8203"
     env_file:
       - ./src/infrastructure/config/.env.prod
+    environment:
+      PORT: "8203"
+      DATABASE_URL: postgresql://postgres:postgres@branch-db-prod:5432/branch_db
     depends_on:
-      - user_profile-db-prod
+      - branch-db-prod
     restart: unless-stopped
     profiles: ["prod"]
 
-  user_profile-db-prod:
+  branch-db-prod:
     image: postgres:16
-    container_name: user_profile-db-prod
+    container_name: branch-db-prod
     env_file:
       - ./src/infrastructure/config/.env.prod
     volumes:

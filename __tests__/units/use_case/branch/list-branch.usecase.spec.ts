@@ -2,10 +2,11 @@ import { vi } from 'vitest';
 import { ListBranchUseCase } from 'src/application/use_case/branch/list-branch.usecase';
 import { buildBranchEntity } from '../../../helpers/branch.factory';
 import { mockBranchRepository } from '../../../helpers/repository.mocks';
+import { createTestAccessGuard, permissiveSecurity } from '../../../helpers/access-guard.mock';
 
 describe('ListBranchUseCase', () => {
   const repository = mockBranchRepository();
-  const useCase = new ListBranchUseCase(repository);
+  const useCase = new ListBranchUseCase(repository, createTestAccessGuard(), permissiveSecurity);
 
   it('retourne une réponse paginée', async () => {
     const entities = [buildBranchEntity(), buildBranchEntity({ code: 'YAM' })];

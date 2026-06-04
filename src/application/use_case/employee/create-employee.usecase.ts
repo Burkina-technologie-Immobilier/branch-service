@@ -5,6 +5,9 @@ import { CreateEmployeeCommand, CreateEmployeeInterfacePort } from "src/domain/p
 import { PublicIdGeneratorPort } from "src/domain/port/in/generate-public-id/generator-public-id.port";
 import { BranchRepositoryPort } from "src/domain/port/out/branch.repository.port";
 import { EmployeeRepositoryPort } from "src/domain/port/out/employee.repository.port";
+import { MeublezonePermission } from "src/domain/enums/meublezone-permission.enum";
+import { AccessGuard } from "src/domain/service/policies/access.guard";
+import { EmployeeRolePolicy } from "src/domain/service/policies/employee-role.policy";
 import { CreateEmployeeValidator } from "src/domain/service/validators/employee/create-employee.validator";
 
 export class CreateEmployeeUseCase implements CreateEmployeeInterfacePort {
@@ -13,10 +16,13 @@ export class CreateEmployeeUseCase implements CreateEmployeeInterfacePort {
     private readonly branchRepository: BranchRepositoryPort,
     private readonly validator: CreateEmployeeValidator,
     private readonly publicIdGenerator: PublicIdGeneratorPort,
+    private readonly access: AccessGuard,
+    private readonly employeeRolePolicy: EmployeeRolePolicy,
   ) {}
 
   async execute(command: CreateEmployeeCommand): Promise<EmployeeEntity> {
     this.validator.validate(command);
+    this.employeeRolePolicy.assertCanAssignRole(undefined, command.role);
 
     const existingEmail = await this.repository.findByEmail(command.email);
     if (existingEmail) {
@@ -31,6 +37,11 @@ export class CreateEmployeeUseCase implements CreateEmployeeInterfacePort {
       }
       branchId = branch.id;
     }
+
+    this.access.check({
+      permission: MeublezonePermission.EMPLOYEE_WRITE,
+      branchId: branchId ?? undefined,
+    });
 
     const publicId = this.publicIdGenerator.generateNanoid();
     const employee = new EmployeeEntity({

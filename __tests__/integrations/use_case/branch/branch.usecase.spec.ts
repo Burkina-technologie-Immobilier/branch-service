@@ -9,6 +9,7 @@ import { CreateBranchValidator } from 'src/domain/service/validators/branch/crea
 import { GetBranchValidator } from 'src/domain/service/validators/branch/get-branch.validator';
 import { DeleteBranchValidator } from 'src/domain/service/validators/branch/delete-branch.validator';
 import { hasDatabase } from '../../../helpers/test-constants';
+import { createTestAccessGuard } from '../../../helpers/access-guard.mock';
 import { nanoid } from 'nanoid';
 
 describe.skipIf(!hasDatabase)('Branch use cases (integration)', () => {
@@ -32,14 +33,16 @@ describe.skipIf(!hasDatabase)('Branch use cases (integration)', () => {
   });
 
   it('crée puis récupère puis supprime une filiale', async () => {
+    const access = createTestAccessGuard();
     const create = new CreateBranchUseCase(
       branchRepo,
       employeeRepo,
       new CreateBranchValidator(),
       new PublicIdGeneratorAdapter(),
+      access,
     );
-    const get = new GetBranchUseCase(branchRepo, new GetBranchValidator());
-    const del = new DeleteBranchUseCase(branchRepo, new DeleteBranchValidator());
+    const get = new GetBranchUseCase(branchRepo, new GetBranchValidator(), access);
+    const del = new DeleteBranchUseCase(branchRepo, new DeleteBranchValidator(), access);
 
     const code = `I${nanoid().slice(0, 7)}`;
     const created = await create.execute({ name: 'Intégration Filiale', code });

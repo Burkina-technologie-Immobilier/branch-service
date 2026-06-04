@@ -8,6 +8,10 @@ import {
   mockBranchRepository,
   mockEmployeeRepository,
 } from '../../../helpers/repository.mocks';
+import {
+  createTestAccessGuard,
+  createTestEmployeeRolePolicy,
+} from '../../../helpers/access-guard.mock';
 import { VALID_EMAIL, VALID_PUBLIC_ID } from '../../../helpers/test-constants';
 
 describe('UpdateEmployeeUseCase', () => {
@@ -17,6 +21,8 @@ describe('UpdateEmployeeUseCase', () => {
     employeeRepo,
     branchRepo,
     new UpdateEmployeeValidator(),
+    createTestAccessGuard(),
+    createTestEmployeeRolePolicy(),
   );
 
   it('met à jour un employé existant', async () => {

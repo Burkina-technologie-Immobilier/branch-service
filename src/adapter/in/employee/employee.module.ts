@@ -14,6 +14,8 @@ import { CreateEmployeeValidator } from 'src/domain/service/validators/employee/
 import { UpdateEmployeeValidator } from 'src/domain/service/validators/employee/update-employee.validator';
 import { GetEmployeeValidator } from 'src/domain/service/validators/employee/get-employee.validator';
 import { DeleteEmployeeValidator } from 'src/domain/service/validators/employee/delete-employee.validator';
+import { AccessGuard } from 'src/domain/service/policies/access.guard';
+import { EmployeeRolePolicy } from 'src/domain/service/policies/employee-role.policy';
 
 @Module({
   imports: [PrismaModule, BranchModule],
@@ -28,35 +30,43 @@ import { DeleteEmployeeValidator } from 'src/domain/service/validators/employee/
     DeleteEmployeeValidator,
     {
       provide: CreateEmployeeUseCase,
-      useFactory: (repo, branchRepo, validator, idGenerator) =>
-        new CreateEmployeeUseCase(repo, branchRepo, validator, idGenerator),
+      useFactory: (repo, branchRepo, validator, idGenerator, access, rolePolicy) =>
+        new CreateEmployeeUseCase(repo, branchRepo, validator, idGenerator, access, rolePolicy),
       inject: [
         'EmployeeRepositoryPort',
         'BranchRepositoryPort',
         CreateEmployeeValidator,
         'PublicIdGeneratorPort',
+        AccessGuard,
+        EmployeeRolePolicy,
       ],
     },
     {
       provide: UpdateEmployeeUseCase,
-      useFactory: (repo, branchRepo, validator) =>
-        new UpdateEmployeeUseCase(repo, branchRepo, validator),
-      inject: ['EmployeeRepositoryPort', 'BranchRepositoryPort', UpdateEmployeeValidator],
+      useFactory: (repo, branchRepo, validator, access, rolePolicy) =>
+        new UpdateEmployeeUseCase(repo, branchRepo, validator, access, rolePolicy),
+      inject: [
+        'EmployeeRepositoryPort',
+        'BranchRepositoryPort',
+        UpdateEmployeeValidator,
+        AccessGuard,
+        EmployeeRolePolicy,
+      ],
     },
     {
       provide: GetEmployeeUseCase,
-      useFactory: (repo, validator) => new GetEmployeeUseCase(repo, validator),
-      inject: ['EmployeeRepositoryPort', GetEmployeeValidator],
+      useFactory: (repo, validator, access) => new GetEmployeeUseCase(repo, validator, access),
+      inject: ['EmployeeRepositoryPort', GetEmployeeValidator, AccessGuard],
     },
     {
       provide: ListEmployeeUseCase,
-      useFactory: (repo, branchRepo) => new ListEmployeeUseCase(repo, branchRepo),
-      inject: ['EmployeeRepositoryPort', 'BranchRepositoryPort'],
+      useFactory: (repo, branchRepo, access) => new ListEmployeeUseCase(repo, branchRepo, access),
+      inject: ['EmployeeRepositoryPort', 'BranchRepositoryPort', AccessGuard],
     },
     {
       provide: DeleteEmployeeUseCase,
-      useFactory: (repo, validator) => new DeleteEmployeeUseCase(repo, validator),
-      inject: ['EmployeeRepositoryPort', DeleteEmployeeValidator],
+      useFactory: (repo, validator, access) => new DeleteEmployeeUseCase(repo, validator, access),
+      inject: ['EmployeeRepositoryPort', DeleteEmployeeValidator, AccessGuard],
     },
   ],
   exports: [

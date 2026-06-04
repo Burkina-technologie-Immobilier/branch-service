@@ -5,11 +5,12 @@ import { GetBranchUseCase } from 'src/application/use_case/branch/get-branch.use
 import { GetBranchValidator } from 'src/domain/service/validators/branch/get-branch.validator';
 import { buildBranchEntity } from '../../../helpers/branch.factory';
 import { mockBranchRepository } from '../../../helpers/repository.mocks';
+import { createTestAccessGuard } from '../../../helpers/access-guard.mock';
 import { VALID_PUBLIC_ID } from '../../../helpers/test-constants';
 
 describe('GetBranchUseCase', () => {
   const repository = mockBranchRepository();
-  const useCase = new GetBranchUseCase(repository, new GetBranchValidator());
+  const useCase = new GetBranchUseCase(repository, new GetBranchValidator(), createTestAccessGuard());
 
   it('retourne la filiale trouvée', async () => {
     const entity = buildBranchEntity();

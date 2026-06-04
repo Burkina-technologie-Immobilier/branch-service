@@ -4,11 +4,12 @@ import { GetEmployeeUseCase } from 'src/application/use_case/employee/get-employ
 import { GetEmployeeValidator } from 'src/domain/service/validators/employee/get-employee.validator';
 import { buildEmployeeEntity } from '../../../helpers/employee.factory';
 import { mockEmployeeRepository } from '../../../helpers/repository.mocks';
+import { createTestAccessGuard } from '../../../helpers/access-guard.mock';
 import { VALID_PUBLIC_ID } from '../../../helpers/test-constants';
 
 describe('GetEmployeeUseCase', () => {
   const repository = mockEmployeeRepository();
-  const useCase = new GetEmployeeUseCase(repository, new GetEmployeeValidator());
+  const useCase = new GetEmployeeUseCase(repository, new GetEmployeeValidator(), createTestAccessGuard());
 
   it('retourne l\'employé trouvé', async () => {
     vi.mocked(repository.findByPublicId).mockResolvedValue(buildEmployeeEntity());

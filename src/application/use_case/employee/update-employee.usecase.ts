@@ -5,6 +5,9 @@ import { GetEmployeeQuery } from "src/domain/port/in/employee/get-employee.inter
 import { UpdateEmployeeCommand, UpdateEmployeeInterfacePort } from "src/domain/port/in/employee/update-employee.interface.port";
 import { BranchRepositoryPort } from "src/domain/port/out/branch.repository.port";
 import { EmployeeRepositoryPort } from "src/domain/port/out/employee.repository.port";
+import { MeublezonePermission } from "src/domain/enums/meublezone-permission.enum";
+import { AccessGuard } from "src/domain/service/policies/access.guard";
+import { EmployeeRolePolicy } from "src/domain/service/policies/employee-role.policy";
 import { UpdateEmployeeValidator } from "src/domain/service/validators/employee/update-employee.validator";
 
 export class UpdateEmployeeUseCase implements UpdateEmployeeInterfacePort {
@@ -12,6 +15,8 @@ export class UpdateEmployeeUseCase implements UpdateEmployeeInterfacePort {
     private readonly repository: EmployeeRepositoryPort,
     private readonly branchRepository: BranchRepositoryPort,
     private readonly validator: UpdateEmployeeValidator,
+    private readonly access: AccessGuard,
+    private readonly employeeRolePolicy: EmployeeRolePolicy,
   ) {}
 
   async execute(query: GetEmployeeQuery, command: UpdateEmployeeCommand): Promise<EmployeeEntity> {
@@ -19,6 +24,13 @@ export class UpdateEmployeeUseCase implements UpdateEmployeeInterfacePort {
     const entity = await this.repository.findByPublicId(query.publicId);
     if (!entity) {
       throw new ApplicationError(CodesError.EMPLOYEE_NOT_FOUND);
+    }
+    this.access.check({
+      permission: MeublezonePermission.EMPLOYEE_WRITE,
+      branchId: entity.branchId,
+    });
+    if (command.role) {
+      this.employeeRolePolicy.assertCanAssignRole(entity.role, command.role);
     }
 
     if (command.email && command.email !== entity.email) {

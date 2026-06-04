@@ -4,11 +4,12 @@ import { DeleteBranchUseCase } from 'src/application/use_case/branch/delete-bran
 import { DeleteBranchValidator } from 'src/domain/service/validators/branch/delete-branch.validator';
 import { buildBranchEntity } from '../../../helpers/branch.factory';
 import { mockBranchRepository } from '../../../helpers/repository.mocks';
+import { createTestAccessGuard } from '../../../helpers/access-guard.mock';
 import { VALID_PUBLIC_ID } from '../../../helpers/test-constants';
 
 describe('DeleteBranchUseCase', () => {
   const repository = mockBranchRepository();
-  const useCase = new DeleteBranchUseCase(repository, new DeleteBranchValidator());
+  const useCase = new DeleteBranchUseCase(repository, new DeleteBranchValidator(), createTestAccessGuard());
 
   it('supprime une filiale existante', async () => {
     vi.mocked(repository.findByPublicId).mockResolvedValue(buildBranchEntity());

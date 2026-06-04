@@ -5,6 +5,8 @@ import { CreateBranchCommand, CreateBranchInterfacePort } from "src/domain/port/
 import { PublicIdGeneratorPort } from "src/domain/port/in/generate-public-id/generator-public-id.port";
 import { BranchRepositoryPort } from "src/domain/port/out/branch.repository.port";
 import { EmployeeRepositoryPort } from "src/domain/port/out/employee.repository.port";
+import { MeublezonePermission } from "src/domain/enums/meublezone-permission.enum";
+import { AccessGuard } from "src/domain/service/policies/access.guard";
 import { CreateBranchValidator } from "src/domain/service/validators/branch/create-branch.validator";
 
 export class CreateBranchUseCase implements CreateBranchInterfacePort {
@@ -13,9 +15,14 @@ export class CreateBranchUseCase implements CreateBranchInterfacePort {
     private readonly employeeRepository: EmployeeRepositoryPort,
     private readonly validator: CreateBranchValidator,
     private readonly publicIdGenerator: PublicIdGeneratorPort,
+    private readonly access: AccessGuard,
   ) {}
 
   async execute(command: CreateBranchCommand): Promise<BranchEntity> {
+    this.access.check({
+      permission: MeublezonePermission.BRANCH_WRITE,
+      siegeOnly: true,
+    });
     this.validator.validate(command);
 
     if (command.code) {

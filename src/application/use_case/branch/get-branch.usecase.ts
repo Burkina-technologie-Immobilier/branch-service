@@ -3,12 +3,15 @@ import { CodesError } from "src/application/errors/codes.error";
 import { BranchEntity } from "src/domain/entities/branch.entity";
 import { GetBranchInterfacePort, GetBranchQuery } from "src/domain/port/in/branch/get-branch.interface.port";
 import { BranchRepositoryPort } from "src/domain/port/out/branch.repository.port";
+import { MeublezonePermission } from "src/domain/enums/meublezone-permission.enum";
+import { AccessGuard } from "src/domain/service/policies/access.guard";
 import { GetBranchValidator } from "src/domain/service/validators/branch/get-branch.validator";
 
 export class GetBranchUseCase implements GetBranchInterfacePort {
   constructor(
     private readonly repository: BranchRepositoryPort,
     private readonly validator: GetBranchValidator,
+    private readonly access: AccessGuard,
   ) {}
 
   async execute(query: GetBranchQuery): Promise<BranchEntity | null> {
@@ -17,6 +20,10 @@ export class GetBranchUseCase implements GetBranchInterfacePort {
     if (!entity) {
       throw new ApplicationError(CodesError.BRANCH_NOT_FOUND);
     }
+    this.access.check({
+      permission: MeublezonePermission.BRANCH_READ,
+      branchId: entity.id,
+    });
     return entity;
   }
 }

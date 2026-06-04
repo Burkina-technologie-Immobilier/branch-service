@@ -12,6 +12,10 @@ export const ErrorRegistry = {
   [CodesError.OPENED_AT_INVALID]: { httpStatus: 400 },
   [CodesError.HIRED_AT_INVALID]: { httpStatus: 400 },
   [CodesError.IS_ACTIVE_INVALID]: { httpStatus: 400 },
+  [CodesError.PERMISSION_DENIED]: { httpStatus: 403 },
+  [CodesError.BRANCH_ACCESS_DENIED]: { httpStatus: 403 },
+  [CodesError.SCOPE_SIEGE_REQUIRED]: { httpStatus: 403 },
+  [CodesError.EMPLOYEE_ROLE_ESCALATION_DENIED]: { httpStatus: 403 },
 } as const satisfies Record<
   (typeof CodesError)[keyof typeof CodesError],
   { httpStatus: number }

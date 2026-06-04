@@ -3,12 +3,15 @@ import { CodesError } from "src/application/errors/codes.error";
 import { EmployeeEntity } from "src/domain/entities/employee.entity";
 import { GetEmployeeInterfacePort, GetEmployeeQuery } from "src/domain/port/in/employee/get-employee.interface.port";
 import { EmployeeRepositoryPort } from "src/domain/port/out/employee.repository.port";
+import { MeublezonePermission } from "src/domain/enums/meublezone-permission.enum";
+import { AccessGuard } from "src/domain/service/policies/access.guard";
 import { GetEmployeeValidator } from "src/domain/service/validators/employee/get-employee.validator";
 
 export class GetEmployeeUseCase implements GetEmployeeInterfacePort {
   constructor(
     private readonly repository: EmployeeRepositoryPort,
     private readonly validator: GetEmployeeValidator,
+    private readonly access: AccessGuard,
   ) {}
 
   async execute(query: GetEmployeeQuery): Promise<EmployeeEntity | null> {
@@ -17,6 +20,10 @@ export class GetEmployeeUseCase implements GetEmployeeInterfacePort {
     if (!entity) {
       throw new ApplicationError(CodesError.EMPLOYEE_NOT_FOUND);
     }
+    this.access.check({
+      permission: MeublezonePermission.EMPLOYEE_READ,
+      branchId: entity.branchId,
+    });
     return entity;
   }
 }

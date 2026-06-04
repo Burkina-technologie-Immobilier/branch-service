@@ -8,6 +8,7 @@ import {
   mockBranchRepository,
   mockEmployeeRepository,
 } from '../../../helpers/repository.mocks';
+import { createTestAccessGuard } from '../../../helpers/access-guard.mock';
 import { VALID_PUBLIC_ID } from '../../../helpers/test-constants';
 
 describe('UpdateBranchUseCase', () => {
@@ -17,6 +18,7 @@ describe('UpdateBranchUseCase', () => {
     branchRepo,
     employeeRepo,
     new UpdateBranchValidator(),
+    createTestAccessGuard(),
   );
 
   it('met à jour une filiale existante', async () => {

@@ -2,6 +2,7 @@ import { IsBoolean, IsNotEmpty, IsOptional, IsString } from "class-validator";
 import { IsNanoId } from "src/lib/decorators.commons";
 
 export class ResponseBranchDto {
+  @IsNotEmpty() id!: string;
   @IsNanoId() @IsNotEmpty() publicId!: string;
   @IsOptional() @IsString() code?: string | null;
   @IsNotEmpty() @IsString() name!: string;

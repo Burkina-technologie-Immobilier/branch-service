@@ -1,0 +1,29 @@
+---
+description: Contraintes détaillées de la couche domain
+alwaysApply: true
+---
+
+# Architecture — Domain
+
+## Responsabilités
+
+- Définir le coeur métier: `entities`, `enums`, *value objects* (types ou fichiers co-localisés avec les entités si besoin).
+- Placer les **policies** et **validators** métier sous `domain/services/policies` et `domain/services/validators` (services de domaine, pas Nest).
+- Définir les contrats d'entrée/sortie via `domain/port/in` et `domain/port/out`.
+- Définir les erreurs métier de validation (`BusinessError`, `domain/errors/codes.error.ts`).
+
+## Dépendances autorisées
+
+- Librairie standard TypeScript/JavaScript uniquement.
+- Fichiers internes `domain/*` et utilitaires neutres (`src/lib/*`) si nécessaire.
+
+## Dépendances interdites
+
+- `@nestjs/*`, Prisma, HTTP, DTO application, controllers, modules.
+- Tout import depuis `application/*`, `adapter/*`, `infrastructure/*`.
+
+## Détails d'implémentation
+
+- Les entités ne connaissent pas la persistence ni les schémas Prisma.
+- Les validateurs lèvent seulement des `BusinessError` avec un code domaine.
+- Les ports expriment des intentions métier, pas des détails techniques.

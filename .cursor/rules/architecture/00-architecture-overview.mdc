@@ -1,0 +1,57 @@
+---
+description: Vue d'ensemble de l'architecture hexagonale par package
+alwaysApply: true
+---
+
+# Architecture — Vue d'ensemble
+
+- Le projet suit une architecture hexagonale organisée en 4 packages: `domain`, `application`, `adapter`, `infrastructure`.
+- Le flux fonctionnel va de l'extérieur vers l'intérieur: HTTP -> adapter/in -> application/use_case -> domain (règles + ports) -> adapter/out -> infrastructure.
+- Les dépendances doivent toujours pointer vers des abstractions métier (`domain/port/*`) et non vers des implémentations techniques.
+
+## Structure de `src/` (référence)
+
+Arborescence alignée sur le dépôt (TypeScript / Nest) :
+
+```
+src/
+  domain/
+    entities/
+    enums/
+    errors/
+    port/in/
+    port/out/
+    services/
+      policies/
+      validators/
+  application/
+    dto/
+    errors/
+    mapper/
+    use_case/
+  adapter/
+    in/
+    out/
+      persistence/
+  infrastructure/
+    config/
+    database/prisma/
+    main.ts
+  lib/
+```
+
+- Point d’entrée applicatif Nest : `infrastructure/main.ts` (bootstrap sans logique métier).
+- Les filtres HTTP globaux et modules d’erreur se placent sous `infrastructure/` lorsqu’ils sont ajoutés (ex. `infrastructure/filters/`).
+- Un binaire Rust historique peut coexister (`src/main.rs`) le temps d’une migration.
+
+## Implémentation attendue
+
+- Un endpoint HTTP appelle un use case, jamais un repository Prisma directement.
+- Un use case orchestre des ports et des entités, sans code NestJS/Prisma.
+- Un adapter out implémente un port et convertit domaine <-> persistence.
+- Infrastructure héberge uniquement le socle technique (Prisma, config, filtres globaux, bootstrap).
+
+## Interdits globaux
+
+- Pas de logique métier dans `adapter/in` ni `infrastructure`.
+- Pas d'import `adapter/*` ou `infrastructure/*` depuis `domain/*` ou `application/*`.

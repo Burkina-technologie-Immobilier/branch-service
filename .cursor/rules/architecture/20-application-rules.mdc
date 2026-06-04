@@ -1,0 +1,28 @@
+---
+description: Contraintes détaillées de la couche application
+alwaysApply: true
+---
+
+# Architecture — Application
+
+## Responsabilités
+
+- Implémenter les cas d'usage (`application/use_case/*`).
+- Faire l'orchestration entre ports, règles métier et mapping.
+- Définir les DTO d'échange et les erreurs applicatives (`ApplicationError`).
+
+## Dépendances autorisées
+
+- `domain/*` (entités, ports, validators dans `domain/services/validators`, erreurs domaine).
+- Types/DTO internes à `application/*`.
+
+## Dépendances interdites
+
+- Import direct de Prisma, `infrastructure/*` ou `adapter/*`.
+- Logique de transport HTTP (decorators NestJS, contrôleurs).
+
+## Détails d'implémentation
+
+- Un use case reçoit des commandes/queries, valide/orchestre, renvoie des objets métier ou vues.
+- Toute interaction externe passe par les ports (`domain/port/out`).
+- Les mappers application adaptent les formats sans contenir de règles métier profondes.

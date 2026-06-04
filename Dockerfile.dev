@@ -1,0 +1,24 @@
+FROM node:20-alpine
+
+WORKDIR /app
+
+# Installer pnpm
+RUN npm install -g pnpm
+
+# Copier uniquement les fichiers de dépendances
+COPY package*.json pnpm-lock.yaml .npmrc ./
+COPY src/infrastructure/config/.env.dev .env
+ENV PRISMA_CLIENT_ENGINE_TYPE=binary
+ENV PRISMA_ENGINES_CHECKSUM_IGNORE_MISSING=1
+
+# Installer les dépendances (.npmrc : timeouts + frozen-lockfile=false)
+RUN pnpm install
+
+# Copier le reste du code (sans node_modules grâce à .dockerignore)
+COPY . .
+
+RUN pnpm exec prisma generate
+
+EXPOSE 8203
+
+CMD ["pnpm", "run", "start:dev"]

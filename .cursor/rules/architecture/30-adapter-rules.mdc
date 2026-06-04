@@ -1,0 +1,28 @@
+---
+description: Contraintes détaillées de la couche adapter (in/out)
+alwaysApply: true
+---
+
+# Architecture — Adapter
+
+## Adapter In (`adapter/in`)
+
+- Contient controllers et modules NestJS.
+- Convertit la requête HTTP en DTO/commande puis appelle un use case.
+- Transforme la réponse via mapper, sans logique métier.
+
+## Adapter Out (`adapter/out`)
+
+- Implémente les ports sortants du domaine (repositories, security, providers).
+- Dépend des abstractions de `domain/port/out`.
+- Gère les détails techniques (Prisma, hash, IO), puis remappe vers le domaine.
+
+## Interdits
+
+- Ajouter des règles métier dans controllers/modules.
+- Bypasser les use cases pour accéder directement à la base depuis `adapter/in`.
+
+## Détails d'implémentation
+
+- Les classes `*.controller.adapter.ts` restent minces: parse -> use case -> mapper -> réponse.
+- Les classes `*.repository.adapter.ts` encapsulent entièrement le mapping BD.

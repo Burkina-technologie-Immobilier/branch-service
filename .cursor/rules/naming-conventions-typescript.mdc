@@ -1,0 +1,35 @@
+---
+description: Conventions de nommage TypeScript / JavaScript (alignées sur les spécifications techniques — pile NestJS)
+alwaysApply: true
+---
+
+# Conventions de nommage — TypeScript / JavaScript (NestJS)
+
+Référence : spécifications techniques du projet (dépôts, code, pile NestJS). S’applique au code source `.ts` / `.tsx` et à l’organisation des fichiers côté backend et front (Next.js le cas échéant).
+
+## Code TypeScript / JavaScript
+
+| Élément | Convention | Exemples |
+|--------|------------|----------|
+| Variables, paramètres, propriétés d’objet | **camelCase** | `userName`, `totalCount`, `isActive` |
+| Fonctions, méthodes | **camelCase** | `getUser()`, `calculateTotal()` |
+| Classes | **PascalCase** | `UserService`, `AuthController` |
+| Interfaces, types, enums | **PascalCase** | `UserProps`, `CreateUserDto`, `StatusEnum` |
+| Constantes globales (exportées, configuration partagée, « vraies » constantes) | **UPPER_SNAKE_CASE** | `MAX_LIMIT`, `API_URL` |
+| Fichiers sources (services, contrôleurs, modules, utilitaires) | **kebab-case** | `user-service.ts`, `create-user.usecase.ts` |
+| Composants UI (React / Next.js) | **PascalCase** (fichier + symbole) | `LoginForm.tsx`, `UserCard.tsx` |
+| Packages / dossiers de modules npm ou dossiers racine de feature | **kebab-case** | `user-module`, `auth-feature` |
+
+## Base de données (Prisma / SQL)
+
+Aligné avec les spécifications : schéma et colonnes en **snake_case** côté persistence ; le mapping domaine / DTO peut utiliser camelCase en application selon les mappers existants.
+
+| Élément | Convention | Exemples |
+|--------|------------|----------|
+| Tables | **snake_case**, souvent pluriel selon le modèle | `users`, `user_roles` |
+| Colonnes | **snake_case** | `first_name`, `created_at` |
+
+## Règles complémentaires
+
+- **Ne pas** mélanger `snake_case` et `camelCase` pour le même concept dans le même fichier sans raison (ex. une seule forme pour les identifiants métier côté code).
+- Les **identifiants publics API** (`publicId`, nanoid) et **identifiants internes** (`id` UUID) suivent en plus la règle dédiée : voir `id-publicid-convention.mdc`.

@@ -1,0 +1,74 @@
+services:
+# =====================================================================================
+# ENV DEV
+# =====================================================================================
+
+  branch-service-dev:
+    image: branch-service-dev
+    container_name: branch-service-dev
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    command: sh -c "pnpm exec prisma migrate deploy && pnpm exec prisma generate && pnpm run start:dev"
+    ports:
+      - "8203:8203"
+    volumes:
+      - .:/app
+      - /app/node_modules
+    environment:
+      PORT: "8203"
+      DATABASE_URL: postgresql://postgres:postgres@branch-db-dev:5432/branch_db
+    env_file:
+      - ./src/infrastructure/config/.env.dev
+    depends_on:
+      - branch-db-dev
+    profiles: ["dev"]
+
+  branch-db-dev:
+    image: postgres:16
+    container_name: branch-db-dev
+    environment:
+      POSTGRES_DB: branch_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5436:5432"
+    volumes:
+      - pgdata-dev:/var/lib/postgresql/data
+    profiles: ["dev"]
+
+
+# =====================================================================================
+# ENV PROD
+# =====================================================================================
+
+  branch-service-prod:
+    container_name: branch-service-prod
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8203:8203"
+    env_file:
+      - ./src/infrastructure/config/.env.prod
+    environment:
+      PORT: "8203"
+      DATABASE_URL: postgresql://postgres:postgres@branch-db-prod:5432/branch_db
+    depends_on:
+      - branch-db-prod
+    restart: unless-stopped
+    profiles: ["prod"]
+
+  branch-db-prod:
+    image: postgres:16
+    container_name: branch-db-prod
+    env_file:
+      - ./src/infrastructure/config/.env.prod
+    volumes:
+      - pgdata-prod:/var/lib/postgresql/data
+    restart: unless-stopped
+    profiles: ["prod"]
+
+volumes:
+  pgdata-dev:
+  pgdata-prod:
